@@ -682,7 +682,7 @@ function pwaPills(){var h="";
  if(PWA.offline)h+='<span class="pill" style="border-color:var(--deep);color:var(--deep)">'+I("check").replace('class="i"','class="i" style="width:16px;height:16px"')+' Works offline</span>';
  if(!PWA.standalone&&(PWA.prompt||(PWA.ready&&PWA.ios)))h+='<button class="pill" data-a="install" style="background:var(--deep);border-color:var(--deep);color:#fff">'+I("phone").replace('class="i"','class="i" style="width:16px;height:16px"')+' Add to home screen</button>';
  return h}
-function installSheet(){return '<div class="scrim" data-a="installclose" style="z-index:79"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Add to home screen" style="--c:var(--deep);--c-soft:#E3F1EE"><header style="background:var(--deep)">'+I("phone")+'<h2>Add to home screen</h2><button class="iconbtn" id="instClose" style="color:#fff" data-a="installclose" aria-label="Close">'+I("close")+'</button></header><div class="body">'+
+function installSheet(){return '<div class="scrim sheetscrim" data-a="installclose" style="z-index:79"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Add to home screen" style="--c:var(--deep);--c-soft:#E3F1EE"><header style="background:var(--deep)">'+I("phone")+'<h2>Add to home screen</h2><button class="iconbtn" id="instClose" style="color:#fff" data-a="installclose" aria-label="Close">'+I("close")+'</button></header><div class="body">'+
  '<ol class="ilist" style="list-style:none">'+[["1","Tap the Share button","chain"],["2","Choose Add to Home Screen","phone"],["3","Tap Add","check"]].map(function(x){return '<li><span class="b" style="font-family:var(--display);font-size:1.4rem">'+x[0]+'</span><span>'+x[1]+'</span></li>'}).join("")+'</ol><p class="small muted">The toolkit then opens from its own icon and works without signal.</p></div></div>'}
 function initPWA(){
  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();PWA.prompt=e;renderRail()});
@@ -1170,7 +1170,7 @@ function helpSheet(){
  var grp=function(main,also){var s=sec(main[0],main[1]),st=splitTitle(s.h);var h='<div class="grp"><h3><span>'+esc(st.t)+'</span><small>'+esc(META[main[0]].short)+'</small></h3>'+ilist(items(s.blocks));
   if(also){var s2=sec(also[0],also[1]);h+='<details class="also"><summary>Same topic in '+esc(META[also[0]].short)+'</summary>'+ilist(items(s2.blocks))+'</details>'}return h+'</div>'};
  var ct=LS.get("tk-contacts",{sup:"",ref:""});
- return '<div class="scrim" data-a="helpclose" style="z-index:79"></div><div class="sheet readable" role="dialog" aria-modal="true" aria-label="Responding to pressure or risk"><header>'+I("alert")+'<h2>Responding to pressure or risk</h2>'+playBtn().replace('class="say play"','class="say play" style="background:#fff"')+'<button class="iconbtn" id="helpClose" style="color:#fff" data-a="helpclose" aria-label="Close">'+I("close")+'</button></header><div class="body">'+
+ return '<div class="scrim sheetscrim" data-a="helpclose" style="z-index:79"></div><div class="sheet readable" role="dialog" aria-modal="true" aria-label="Responding to pressure or risk"><header>'+I("alert")+'<h2>Responding to pressure or risk</h2>'+playBtn().replace('class="say play"','class="say play" style="background:#fff"')+'<button class="iconbtn" id="helpClose" style="color:#fff" data-a="helpclose" aria-label="Close">'+I("close")+'</button></header><div class="body">'+
   '<div class="card contact"><label for="ctSup">Supervisor</label><input id="ctSup" data-ct="sup" value="'+esc(ct.sup)+'" placeholder="Name and phone number" autocomplete="off"><label for="ctRef">Referral contact</label><input id="ctRef" data-ct="ref" value="'+esc(ct.ref)+'" placeholder="Name and phone number" autocomplete="off"><span class="small muted">Saved on this phone only.</span></div>'+
   grp(["c8","j."],["c6","j."])+grp(["c8","m."],["c6","l."])+grp(["c5","k."])+'</div></div>'}
 
@@ -1209,7 +1209,7 @@ function render(scrollTop){
  $("#main").innerHTML=h;
  renderRail();
  $("#topTitle").textContent=r==="home"?"Home":r==="supervisor"?"Supervisor / Team leader":((META[r]||META.refs).short);
- document.querySelectorAll(".overlay,.sheet").forEach(function(e){e.remove()});
+ document.querySelectorAll(".overlay,.sheet,.sheetscrim").forEach(function(e){e.remove()});
  if(overlay==="help"){document.body.insertAdjacentHTML("beforeend",helpSheet());var hc=$("#helpClose");if(hc)hc.focus()}
  if(overlay==="install"){document.body.insertAdjacentHTML("beforeend",installSheet());var ic=$("#instClose");if(ic)ic.focus()}
  if(overlay==="search"){document.body.insertAdjacentHTML("beforeend",searchBox());var si=$("#sIn");si.focus()}
