@@ -70,6 +70,12 @@ svg.i{width:24px;height:24px;flex:none;stroke:currentColor;fill:none;stroke-widt
 main{margin-left:var(--rail);min-height:100vh;padding-bottom:48px}
 .riskbtn{display:flex;align-items:center;gap:10px;margin:4px 16px 12px;background:var(--alert);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700;font-size:.92rem;line-height:1.25;text-align:left}
 .riskbtn:hover{background:#9A3815}
+.askfab{position:fixed;z-index:36;right:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;background:var(--deep);color:#fff;display:grid;place-items:center;box-shadow:0 14px 28px -10px rgba(12,70,91,.55);transition:transform .15s}
+.askfab:hover{transform:scale(1.06)}.askfab[hidden]{display:none}.askfab svg.i{width:28px;height:28px}
+@media (max-width:860px){body.hasdeck .askfab{bottom:calc(86px + env(safe-area-inset-bottom,0px))}}
+.sheet.wide{width:min(960px,calc(100vw - 32px));top:max(16px,env(safe-area-inset-top,0px));max-height:none}
+@media (max-width:860px){.sheet.wide{left:0;right:0;top:0;bottom:0;width:100vw;border-radius:0}}
+.sheet.wide .askres p{font-size:1.12rem}
 .askbtn{background:var(--deep);margin-bottom:6px}.askbtn:hover{background:#0F5A52}
 .topbar .risktop.asktop{background:var(--deep)}.topbar .asktop[hidden]{display:none}
 .askin{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:1.02rem;margin-top:4px;background:#fff}
@@ -482,13 +488,13 @@ details.also summary{cursor:pointer;font-weight:700;font-size:.9rem;color:var(--
 <div class="topbar" id="topbar">
   <button class="iconbtn" id="menuBtn" aria-label="Menu"></button>
   <div class="t" id="topTitle">Toolkit</div>
-  <button class="iconbtn risktop asktop" id="askTop" data-a="ask" aria-label="Ask the toolkit" title="Ask the toolkit" hidden></button>
   <button class="iconbtn risktop" id="riskTop" data-a="help" aria-label="Responding to pressure or risk" title="Responding to pressure or risk"></button>
   <button class="iconbtn" id="searchTop" aria-label="Search"></button>
 </div>
 <nav class="rail" id="rail" aria-label="Chapters"></nav>
 <main id="main"><div class="loading">Loading…</div></main>
 <button class="fab" id="fab" hidden></button>
+<button class="askfab" id="askFab" data-a="ask" aria-label="Ask the toolkit" title="Ask the toolkit" hidden></button>
 
 <script>
 (function(){
@@ -558,6 +564,8 @@ var P={
  pause:'<path d="M8 5v14M16 5v14"/>',
  type:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',
  dot:'<circle cx="12" cy="12" r="3"/>',
+ expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+ shrink:'<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>',
  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>'
 };
@@ -637,9 +645,9 @@ var ASK_DEFAULT="https://toolkit-ask.james-wareing.workers.dev/";
 var ASK_URL=LS.get("tk-askurl","")||ASK_DEFAULT;
 try{if(/[?&]ask\b/.test(location.search))LS.set("tk-askon",true)}catch(e){}
 function askOn(){return !!ASK_URL&&LS.get("tk-askon",false)&&navigator.onLine!==false}
-function askTopSync(){var b=$("#askTop");if(b){b.hidden=!askOn();if(!b.innerHTML)b.innerHTML=I("speech")+'<span>Ask</span>'}}
-function askSheet(){var A=S.ask,code=LS.get("tk-askcode",""),h="";
- h+='<div class="scrim sheetscrim" data-a="askclose" style="z-index:79"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Ask the toolkit" style="--c:var(--deep);--c-soft:#E3F1EE"><header style="background:var(--deep)">'+I("speech")+'<h2>Ask the toolkit</h2><button class="iconbtn" id="askClose" style="color:#fff" data-a="askclose" aria-label="Close">'+I("close")+'</button></header><div class="body">';
+function askTopSync(){var b=$("#askFab");if(b){b.hidden=!askOn()||overlay==="ask";if(!b.innerHTML)b.innerHTML=I("speech")}document.body.classList.toggle("hasdeck",!!document.querySelector(".decknav.sticky"))}
+function askSheet(){var A=S.ask,code=LS.get("tk-askcode",""),h="",wide=LS.get("tk-askwide",false);
+ h+='<div class="scrim sheetscrim" data-a="askclose" style="z-index:79"></div><div class="sheet asksheet'+(wide?" wide":"")+'" role="dialog" aria-modal="true" aria-label="Ask the toolkit" style="--c:var(--deep);--c-soft:#E3F1EE"><header style="background:var(--deep)">'+I("speech")+'<h2>Ask the toolkit</h2><button class="iconbtn" style="color:#fff" data-a="askwide" aria-label="'+(wide?"Make smaller":"Expand")+'" title="'+(wide?"Make smaller":"Expand")+'">'+I(wide?"shrink":"expand")+'</button><button class="iconbtn" id="askClose" style="color:#fff" data-a="askclose" aria-label="Close">'+I("close")+'</button></header><div class="body">';
  h+='<p class="hint" style="color:#8A3A12">'+I("alert")+'Do not type names or personal details of respondents.</p>';
  if(!code)h+='<label class="small" style="font-weight:700" for="askCode">Demo passcode</label><input id="askCode" type="password" autocomplete="off" class="askin" style="margin-bottom:12px">';
  h+='<label class="small" style="font-weight:700" for="askQ">Your question</label><textarea id="askQ" class="askin" maxlength="500" rows="3">'+esc(A.q)+'</textarea>';
@@ -1354,6 +1362,7 @@ document.addEventListener("click",function(e){
   case "installclose":overlay=null;render(false);break;
   case "ask":if(!askOn())break;overlay="ask";render(false);break;
   case "askclose":overlay=null;render(false);break;
+  case "askwide":LS.set("tk-askwide",!LS.get("tk-askwide",false));render(false);break;
   case "asksend":if(!S.ask.busy)askSend();break;
   case "askforget":LS.set("tk-askcode","");render(false);break;
   case "big":document.documentElement.classList.toggle("big");LS.set("tk-big",document.documentElement.classList.contains("big"));renderRail();break;
