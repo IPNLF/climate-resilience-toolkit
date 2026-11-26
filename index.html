@@ -75,7 +75,10 @@ main{margin-left:var(--rail);min-height:100vh;padding-bottom:48px}
 @media (max-width:860px){body.hasdeck .askfab{bottom:calc(86px + env(safe-area-inset-bottom,0px))}}
 .sheet.wide{width:min(960px,calc(100vw - 32px));top:max(16px,env(safe-area-inset-top,0px));max-height:none}
 @media (max-width:860px){.sheet.wide{left:0;right:0;top:0;bottom:0;width:100vw;border-radius:0}}
-.sheet.wide .askres p{font-size:1.12rem}
+.askres{display:grid;gap:12px}
+.askpart h3{font-size:1.05rem;line-height:1.3;color:var(--navy);margin-bottom:6px}
+.askpts{margin:0;padding-left:20px;font-size:1.02rem;line-height:1.5}.askpts li{margin-top:4px}
+.sheet.wide .askpts{font-size:1.1rem}
 .askbtn{background:var(--deep);margin-bottom:6px}.askbtn:hover{background:#0F5A52}
 .topbar .risktop.asktop{background:var(--deep)}.topbar .asktop[hidden]{display:none}
 .askin{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:1.02rem;margin-top:4px;background:#fff}
@@ -653,10 +656,11 @@ function askSheet(){var A=S.ask,code=LS.get("tk-askcode",""),h="",wide=LS.get("t
  h+='<label class="small" style="font-weight:700" for="askQ">Your question</label><textarea id="askQ" class="askin" maxlength="500" rows="3">'+esc(A.q)+'</textarea>';
  h+='<div class="row" style="margin-top:10px;justify-content:space-between"><button class="btn c" data-a="asksend"'+(A.busy?" disabled":"")+'>'+(A.busy?"Asking…":I("search")+"Ask")+'</button>'+(code?'<button class="chip" data-a="askforget">Change passcode</button>':"")+'</div>';
  if(A.err)h+='<div class="callout" style="margin-top:14px">'+I("alert")+'<p>'+esc(A.err)+'</p></div>';
- if(A.res){var R2=A.res;
-  h+='<div class="card askres" style="margin-top:14px"><p style="font-size:1.05rem;line-height:1.55">'+esc(R2.answer)+'</p>';
-  if(R2.unsupported)h+='<p class="hint" style="color:#8A3A12;margin-top:10px">'+I("alert")+'No quote from the toolkit supports this answer. Treat it with caution.</p>';
-  if(R2.quotes&&R2.quotes.length){h+='<p class="small" style="font-weight:700;margin:14px 0 6px;color:var(--c)">From the toolkit</p>'+R2.quotes.map(function(q){var ch=chapterOf(q.block),m=META[ch?ch.id:"refs"]||META.refs;return '<button class="quote askq" data-a="jumpfull" data-v="'+q.block+'">'+esc(q.text)+'<small>'+esc(m.short)+' · open in the toolkit</small></button>'}).join("")}
+ if(A.res){var R2=A.res,parts=R2.parts||[{heading:"",points:[R2.answer||""],quotes:R2.quotes||[],unsupported:R2.unsupported}];
+  var qb=function(q){var ch=chapterOf(q.block),m=META[ch?ch.id:"refs"]||META.refs;return '<button class="quote askq" data-a="jumpfull" data-v="'+q.block+'">'+esc(q.text)+'<small>'+esc(m.short)+' · open in the toolkit</small></button>'};
+  h+='<div class="askres" style="margin-top:14px">'+parts.map(function(pt){return '<div class="card askpart">'+(pt.heading?'<h3>'+esc(pt.heading)+'</h3>':'')+'<ul class="askpts">'+(pt.points||[]).map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>'+
+   (pt.unsupported?'<p class="hint" style="color:#8A3A12;margin:10px 0 0">'+I("alert")+'No quote from the toolkit supports this part. Treat it with caution.</p>':'')+
+   (pt.quotes&&pt.quotes.length?'<p class="small" style="font-weight:700;margin:12px 0 2px;color:var(--c)">From the toolkit</p>'+pt.quotes.map(qb).join(""):'')+'</div>'}).join("");
   if(R2.dropped)h+='<p class="small muted" style="margin-top:8px">'+R2.dropped+(R2.dropped===1?' quote was':' quotes were')+' removed because '+(R2.dropped===1?'it is':'they are')+' not in the toolkit.</p>';
   h+='</div>'}
  h+='<p class="small muted" style="margin-top:14px">Demo. Answers are written by an AI (OpenAI) using only the toolkit text, and can be wrong. Quotes are checked word for word against the toolkit. Always check the toolkit itself. Needs a signal.</p></div></div>';
