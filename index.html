@@ -70,6 +70,11 @@ svg.i{width:24px;height:24px;flex:none;stroke:currentColor;fill:none;stroke-widt
 main{margin-left:var(--rail);min-height:100vh;padding-bottom:48px}
 .riskbtn{display:flex;align-items:center;gap:10px;margin:4px 16px 12px;background:var(--alert);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700;font-size:.92rem;line-height:1.25;text-align:left}
 .riskbtn:hover{background:#9A3815}
+.askbtn{background:var(--deep);margin-bottom:6px}.askbtn:hover{background:#0F5A52}
+.topbar .risktop.asktop{background:var(--deep)}.topbar .asktop[hidden]{display:none}
+.askin{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:1.02rem;margin-top:4px;background:#fff}
+.askq{display:block;width:100%;text-align:left;margin-top:8px;background:var(--c-soft);border-radius:0 12px 12px 0;padding:10px 12px 10px 14px}
+.askq small{display:block;margin-top:6px;font-size:.8rem;font-weight:700;color:var(--c)}
 .topbar .risktop{background:var(--alert);color:#fff;width:auto;padding:0 12px 0 10px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:.95rem}
 .wrap{max-width:1040px;margin:0 auto;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
 
@@ -477,6 +482,7 @@ details.also summary{cursor:pointer;font-weight:700;font-size:.9rem;color:var(--
 <div class="topbar" id="topbar">
   <button class="iconbtn" id="menuBtn" aria-label="Menu"></button>
   <div class="t" id="topTitle">Toolkit</div>
+  <button class="iconbtn risktop asktop" id="askTop" data-a="ask" aria-label="Ask the toolkit" title="Ask the toolkit" hidden></button>
   <button class="iconbtn risktop" id="riskTop" data-a="help" aria-label="Responding to pressure or risk" title="Responding to pressure or risk"></button>
   <button class="iconbtn" id="searchTop" aria-label="Search"></button>
 </div>
@@ -620,11 +626,40 @@ var B=[],CH=[],CHI={};
 var PWA={ready:false,offline:false,prompt:null,ios:/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),standalone:(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true};
 var S={tester:LS.get("tk-tester2",false),locked:false,route:"home",mode:LS.get("tk-mode",{}),variant:LS.get("tk-var2",{home:"A",sop:"C",survey:"A",consent:"B"}),
  ticks:LS.get("tk-ticks",{}),pendingBlock:null,tab:{},deck:{},q:{},timer:{el:0,run:false,h:null},
- fgdc:{p:0},sopOpen:{},tlr:LS.get("tk-tl",[]),psp:{count:{f:0,m:0},cal:LS.get("tk-cal",{}),hot:LS.get("tk-hot",{}),score:[3,3,3,3,3,3],tl:0,plan:{}},journey:{0:0,1:0},pick:{},venn:0,level:0,fgdGroup:LS.get("tk-fgdg",0),fgdQ:0,why:{},open:{},glossQ:""};
+ fgdc:{p:0},sopOpen:{},ask:{q:"",busy:false,res:null,err:""},tlr:LS.get("tk-tl",[]),psp:{count:{f:0,m:0},cal:LS.get("tk-cal",{}),hot:LS.get("tk-hot",{}),score:[3,3,3,3,3,3],tl:0,plan:{}},journey:{0:0,1:0},pick:{},venn:0,level:0,fgdGroup:LS.get("tk-fgdg",0),fgdQ:0,why:{},open:{},glossQ:""};
 var SAY={},sayN=0;
 var TTS=("speechSynthesis" in window)&&typeof SpeechSynthesisUtterance!=="undefined";
 if(!TTS)document.documentElement.classList.add("nosay");
 if(LS.get("tk-big",false))document.documentElement.classList.add("big");
+/* "Ask the toolkit" demo. ASK_DEFAULT is the address of the Cloudflare Worker once it is set up.
+   The panel only shows on phones that opened the site with ?ask in the address, and only when online. */
+var ASK_DEFAULT="";
+var ASK_URL=LS.get("tk-askurl","")||ASK_DEFAULT;
+try{if(/[?&]ask\b/.test(location.search))LS.set("tk-askon",true)}catch(e){}
+function askOn(){return !!ASK_URL&&LS.get("tk-askon",false)&&navigator.onLine!==false}
+function askTopSync(){var b=$("#askTop");if(b){b.hidden=!askOn();if(!b.innerHTML)b.innerHTML=I("speech")+'<span>Ask</span>'}}
+function askSheet(){var A=S.ask,code=LS.get("tk-askcode",""),h="";
+ h+='<div class="scrim sheetscrim" data-a="askclose" style="z-index:79"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Ask the toolkit" style="--c:var(--deep);--c-soft:#E3F1EE"><header style="background:var(--deep)">'+I("speech")+'<h2>Ask the toolkit</h2><button class="iconbtn" id="askClose" style="color:#fff" data-a="askclose" aria-label="Close">'+I("close")+'</button></header><div class="body">';
+ h+='<p class="hint" style="color:#8A3A12">'+I("alert")+'Do not type names or personal details of respondents.</p>';
+ if(!code)h+='<label class="small" style="font-weight:700" for="askCode">Demo passcode</label><input id="askCode" type="password" autocomplete="off" class="askin" style="margin-bottom:12px">';
+ h+='<label class="small" style="font-weight:700" for="askQ">Your question</label><textarea id="askQ" class="askin" maxlength="500" rows="3">'+esc(A.q)+'</textarea>';
+ h+='<div class="row" style="margin-top:10px;justify-content:space-between"><button class="btn c" data-a="asksend"'+(A.busy?" disabled":"")+'>'+(A.busy?"Asking…":I("search")+"Ask")+'</button>'+(code?'<button class="chip" data-a="askforget">Change passcode</button>':"")+'</div>';
+ if(A.err)h+='<div class="callout" style="margin-top:14px">'+I("alert")+'<p>'+esc(A.err)+'</p></div>';
+ if(A.res){var R2=A.res;
+  h+='<div class="card askres" style="margin-top:14px"><p style="font-size:1.05rem;line-height:1.55">'+esc(R2.answer)+'</p>';
+  if(R2.unsupported)h+='<p class="hint" style="color:#8A3A12;margin-top:10px">'+I("alert")+'No quote from the toolkit supports this answer. Treat it with caution.</p>';
+  if(R2.quotes&&R2.quotes.length){h+='<p class="small" style="font-weight:700;margin:14px 0 6px;color:var(--c)">From the toolkit</p>'+R2.quotes.map(function(q){var ch=chapterOf(q.block),m=META[ch?ch.id:"refs"]||META.refs;return '<button class="quote askq" data-a="jumpfull" data-v="'+q.block+'">'+esc(q.text)+'<small>'+esc(m.short)+' · open in the toolkit</small></button>'}).join("")}
+  if(R2.dropped)h+='<p class="small muted" style="margin-top:8px">'+R2.dropped+(R2.dropped===1?' quote was':' quotes were')+' removed because '+(R2.dropped===1?'it is':'they are')+' not in the toolkit.</p>';
+  h+='</div>'}
+ h+='<p class="small muted" style="margin-top:14px">Demo. Answers are written by an AI (OpenAI) using only the toolkit text, and can be wrong. Quotes are checked word for word against the toolkit. Always check the toolkit itself. Needs a signal.</p></div></div>';
+ return h}
+function askSend(){var qi=$("#askQ"),ci=$("#askCode");var q=((qi&&qi.value)||S.ask.q||"").trim();S.ask.q=q;if(q.length<3){S.ask.err="Type a question.";render(false);return}
+ var code=LS.get("tk-askcode","")||(ci?ci.value.trim():"");if(!code){S.ask.err="Enter the demo passcode.";render(false);return}
+ LS.set("tk-askcode",code);S.ask.busy=true;S.ask.err="";S.ask.res=null;render(false);
+ fetch(ASK_URL,{method:"POST",headers:{"Content-Type":"application/json","X-Demo-Code":code},body:JSON.stringify({question:q})})
+ .then(function(r){return r.json().then(function(d){return {ok:r.ok,s:r.status,d:d}},function(){return {ok:false,s:r.status,d:{}}})})
+ .then(function(x){S.ask.busy=false;if(!x.ok){S.ask.err=x.d.error||"Something went wrong.";if(x.s===401)LS.set("tk-askcode","")}else S.ask.res=x.d;if(overlay==="ask")render(false)})
+ .catch(function(){S.ask.busy=false;S.ask.err="Could not reach the Ask service. Check your signal and try again.";if(overlay==="ask")render(false)})}
 function saveVar(){LS.set("tk-var2",S.variant)}
 
 /* ============ Load & structure ============ */
@@ -710,7 +745,7 @@ function renderRail(){
  CH.forEach(function(c){var m=META[c.id]||META.refs,n=c.id.charAt(0)==="c"?c.id.slice(1):"";
   if(c.id==="c1")h+='<button class="navitem" data-a="nav" data-v="supervisor" aria-current="'+(r==="supervisor"?"page":"false")+'"><span class="num" style="background:'+ALT[(alt++)%2]+'">'+I("flag").replace('class="i"','class="i" style="width:15px;height:15px"')+'</span>Supervisor / Team leader</button>';
   h+='<button class="navitem" data-a="nav" data-v="'+c.id+'" aria-current="'+(r===c.id?"page":"false")+'"><span class="num" style="background:'+ALT[(alt++)%2]+'">'+(n||I(m.icon).replace('class="i"','class="i" style="width:15px;height:15px"'))+'</span>'+esc(m.short)+'</button>'});
- h+='</div><button class="riskbtn" data-a="help">'+I("alert")+'<span>Responding to pressure or risk</span></button><div class="railfoot"><button class="pill" data-a="big" aria-pressed="'+document.documentElement.classList.contains("big")+'">'+I("type").replace('class="i"','class="i" style="width:16px;height:16px"')+' Larger text</button>'+(TTS?'<button class="pill" data-a="slow" aria-pressed="'+(RATE<.8)+'">'+I("speaker").replace('class="i"','class="i" style="width:16px;height:16px"')+' Slower speech</button>':'')+'<button class="pill testpill" data-a="tester" aria-pressed="'+S.tester+'">Design testing</button>'+pwaPills()+'</div>';
+ h+='</div>'+(askOn()?'<button class="riskbtn askbtn" data-a="ask">'+I("speech")+'<span>Ask the toolkit</span></button>':'')+'<button class="riskbtn" data-a="help">'+I("alert")+'<span>Responding to pressure or risk</span></button><div class="railfoot"><button class="pill" data-a="big" aria-pressed="'+document.documentElement.classList.contains("big")+'">'+I("type").replace('class="i"','class="i" style="width:16px;height:16px"')+' Larger text</button>'+(TTS?'<button class="pill" data-a="slow" aria-pressed="'+(RATE<.8)+'">'+I("speaker").replace('class="i"','class="i" style="width:16px;height:16px"')+' Slower speech</button>':'')+'<button class="pill testpill" data-a="tester" aria-pressed="'+S.tester+'">Design testing</button>'+pwaPills()+'</div>';
  $("#rail").innerHTML=h;
 }
 
@@ -722,6 +757,7 @@ function pwaPills(){var h="";
 function installSheet(){return '<div class="scrim sheetscrim" data-a="installclose" style="z-index:79"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="Add to home screen" style="--c:var(--deep);--c-soft:#E3F1EE"><header style="background:var(--deep)">'+I("phone")+'<h2>Add to home screen</h2><button class="iconbtn" id="instClose" style="color:#fff" data-a="installclose" aria-label="Close">'+I("close")+'</button></header><div class="body">'+
  '<ol class="ilist" style="list-style:none">'+[["1","Tap the Share button","chain"],["2","Choose Add to Home Screen","phone"],["3","Tap Add","check"]].map(function(x){return '<li><span class="b" style="font-family:var(--display);font-size:1.4rem">'+x[0]+'</span><span>'+x[1]+'</span></li>'}).join("")+'</ol><p class="small muted">The toolkit then opens from its own icon and works without signal.</p></div></div>'}
 function initPWA(){
+ window.addEventListener("online",function(){renderRail();askTopSync()});window.addEventListener("offline",function(){if(overlay==="ask"){overlay=null;render(false)}else{renderRail();askTopSync()}});
  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();PWA.prompt=e;renderRail()});
  window.addEventListener("appinstalled",function(){PWA.prompt=null;PWA.standalone=true;toast("Installed");renderRail()});
  if(!("serviceWorker" in navigator))return;
@@ -1265,6 +1301,8 @@ function render(scrollTop){
  document.querySelectorAll(".overlay,.sheet,.sheetscrim").forEach(function(e){e.remove()});
  if(overlay==="help"){document.body.insertAdjacentHTML("beforeend",helpSheet());var hc=$("#helpClose");if(hc)hc.focus()}
  if(overlay==="install"){document.body.insertAdjacentHTML("beforeend",installSheet());var ic=$("#instClose");if(ic)ic.focus()}
+ if(overlay==="ask"){document.body.insertAdjacentHTML("beforeend",askSheet());var aq=$("#askCode")||$("#askQ");if(aq&&!S.ask.busy&&!S.ask.res&&!S.ask.err)aq.focus()}
+ askTopSync();
  if(overlay==="search"){document.body.insertAdjacentHTML("beforeend",searchBox());var si=$("#sIn");si.focus()}
  $("#fab").hidden=true;
  if(S.pendingSel){var pe=document.getElementById(S.pendingSel);S.pendingSel=null;window.scrollTo(0,0);if(pe)setTimeout(function(){pe.scrollIntoView({block:"start"})},40)}
@@ -1314,6 +1352,10 @@ document.addEventListener("click",function(e){
   case "helpclose":overlay=null;render(false);break;
   case "install":if(PWA.prompt){PWA.prompt.prompt();PWA.prompt.userChoice.then(function(){PWA.prompt=null;renderRail()})}else{overlay="install";render(false)}break;
   case "installclose":overlay=null;render(false);break;
+  case "ask":if(!askOn())break;overlay="ask";render(false);break;
+  case "askclose":overlay=null;render(false);break;
+  case "asksend":if(!S.ask.busy)askSend();break;
+  case "askforget":LS.set("tk-askcode","");render(false);break;
   case "big":document.documentElement.classList.toggle("big");LS.set("tk-big",document.documentElement.classList.contains("big"));renderRail();break;
   case "jstop":{var p4=v.split(":");S.journey[p4[0]]=+p4[1];render(false);break}
   case "jstep":{var p5=v.split(":");S.journey[p5[0]]=(S.journey[p5[0]]||0)+(+p5[1]);render(false);break}
@@ -1354,6 +1396,7 @@ document.addEventListener("input",function(e){var t=e.target;
  if(t.id==="sIn")doSearch(t.value);
  else if(t.id==="glossIn"){S.glossQ=t.value;var gl=CHI.glossary.blocks.filter(function(b){return b.t==="table"});var q=t.value.trim().toLowerCase();$("#glossOut").innerHTML=glossList(gl[0].rows.slice(1),gl[1]?gl[1].rows.slice(1):[],function(r){return !q||r.join(" ").toLowerCase().indexOf(q)>-1})}
  else if(t.id&&t.id.indexOf("sc")===0&&t.dataset.i!=null){var i=+t.dataset.i;S.psp.score[i]=+t.value;$("#so"+i).textContent=t.value;var comps=["access to climate information","strength of social networks","governance systems","institutional support","compliance with fisheries regulations","opportunities for livelihood diversification"];var rd=$("#radar");if(rd)rd.outerHTML=radar(S.psp.score,comps)}
+ else if(t.id==="askQ"){S.ask.q=t.value}
  else if(t.dataset&&t.dataset.plan!=null){S.psp.plan[t.dataset.plan]=t.value}
  else if(t.dataset&&t.dataset.tl){var tp=t.dataset.tl.split(":");if(S.tlr[+tp[0]]){S.tlr[+tp[0]][+tp[1]]=t.value;LS.set("tk-tl",S.tlr)}}
  else if(t.dataset&&t.dataset.ct){var ct=LS.get("tk-contacts",{sup:"",ref:""});ct[t.dataset.ct]=t.value;LS.set("tk-contacts",ct)}
