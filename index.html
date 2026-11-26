@@ -380,6 +380,8 @@ details.also summary{cursor:pointer;font-weight:700;font-size:.9rem;color:var(--
 .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .fact b,.tile b{overflow-wrap:break-word;hyphens:manual}
 .itiles .tile{align-items:center;text-align:center}
+.itiles{grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+@media (max-width:860px){.itiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .groupcard[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}
 .out{background:var(--c-soft);border-radius:12px;padding:12px 14px;font-size:.95rem}
 .dotsize{display:flex;gap:5px;flex-wrap:wrap}
@@ -890,7 +892,7 @@ GUIDES.c1=function(c){
   var list=core.split(/,\s*/).map(function(x){return x.replace(/^(and|as well as)\s+/,"").trim()}).filter(function(x){return x.length>2});return {h:s.h,sent:sent,list:list,i:s.b.i}});
  var lv=L[S.level]||L[0],licons=["people","house","chain"];
  h+=gsec("e.",splitTitle(e.h).t,'<div class="tabs" style="margin-top:0">'+L.map(function(l,i){return '<button data-a="level" data-v="'+i+'" aria-pressed="'+(S.level===i)+'">'+I(licons[i]).replace('class="i"','class="i" style="width:18px;height:18px"')+esc(l.h.replace(/^e\.\d\.\s*/,""))+'</button>'}).join("")+'</div>'+
-  '<div class="card" style="margin-top:10px"><div class="tiles itiles" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">'+lv.list.map(function(x){return '<div class="tile" style="min-height:0;padding:14px;cursor:default"><span class="pic" style="width:44px;height:44px">'+I(iconFor(x))+'</span><b style="font-size:.95rem">'+esc(x.trim())+'</b></div>'}).join("")+'</div><div class="quote" style="margin-top:16px">'+esc(lv.sent)+'</div><div class="row" style="margin-top:12px">'+readMore(lv.i)+'</div></div>');
+  '<div class="card" style="margin-top:10px"><div class="tiles itiles" style="'+balCols(lv.list.length)+'">'+lv.list.map(function(x){return '<div class="tile" style="min-height:0;padding:14px;cursor:default"><span class="pic" style="width:44px;height:44px">'+I(iconFor(x))+'</span><b style="font-size:.95rem">'+esc(x.trim())+'</b></div>'}).join("")+'</div><div class="quote" style="margin-top:16px">'+esc(lv.sent)+'</div><div class="row" style="margin-top:12px">'+readMore(lv.i)+'</div></div>');
  // Lessons
  var g=sec("c1","g."),lp=para(g.blocks,"Across the studies");var parts=lp.split(/\s(?=First,|Second,|Third,|Overall,)/);
  h+=gsec("g.",splitTitle(g.h).t,'<p class="lead2">'+esc(parts[0])+'</p><div class="grid3" style="margin-top:14px">'+parts.slice(1,4).map(function(p,i){return '<div class="card"><div style="font-family:var(--display);font-size:3rem;line-height:.8;color:var(--c)">'+(i+1)+'</div><p style="margin-top:10px">'+esc(p)+'</p></div>'}).join("")+'</div>'+(parts[4]?'<div class="callout" style="margin-top:14px">'+I("leaf")+'<p>'+esc(parts[4])+'</p></div>':""));
@@ -917,7 +919,7 @@ GUIDES.c2=function(c){
   var pI=["fish","people","route","woman","people","person","building","handshake","building","grad","people"];
   var f=S.psp.count.f,m=S.psp.count.m,tot=f+m,pct=tot?Math.round(f/tot*100):0,ok=pct>=30,ok68=tot>=6&&tot<=8;
   body=gsec("c.",splitTitle(cc.h).t,'<p class="lead2">'+esc(para(cc.blocks,"Participants will represent"))+'</p>')+
-   gsec("","Potential participant groups",'<div class="tiles itiles" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">'+pot.map(function(x,i){return '<div class="tile" style="min-height:0;padding:16px;cursor:default"><span class="pic" style="width:48px;height:48px">'+I(pI[i]||iconFor(x.x))+'</span><b style="font-size:.95rem">'+esc(x.x)+'</b></div>'}).join("")+'</div>')+
+   gsec("","Potential participant groups",'<div class="tiles itiles" style="'+balCols(pot.length)+'">'+pot.map(function(x,i){return '<div class="tile" style="min-height:0;padding:16px;cursor:default"><span class="pic" style="width:48px;height:48px">'+I(pI[i]||iconFor(x.x))+'</span><b style="font-size:.95rem">'+esc(x.x)+'</b></div>'}).join("")+'</div>')+
    gsec("","Suggested grouping approach",'<div class="grid3">'+cols.map(function(col){return '<div class="card"><b style="color:var(--c)">'+esc(col.h)+'</b>'+ilist(col.i).replace('class="ilist"','class="ilist" style="margin-top:10px"')+'</div>'}).join("")+'</div>')+
    gsec("","GEDSI principles",'<div class="grid2"><div>'+ilist(ged)+'</div><div class="card"><div class="row" style="justify-content:space-between"><b>'+esc(ged[0]?ged[0].x:"")+'</b><b style="font-family:var(--display);font-size:2rem;font-weight:400;color:'+(ok?"var(--c)":"#A86A00")+'">'+pct+'%</b></div><div class="meter" style="margin:10px 0 4px"><i style="width:'+pct+'%;background:'+(ok?"var(--c)":"var(--gold)")+'"></i><span class="tg" style="left:30%"></span></div>'+
    '<div class="counter"><span class="row">'+I("woman")+'<b>Female</b></span><span class="ctl"><button data-a="cnt" data-v="f:-1" aria-label="Remove">−</button><output>'+f+'</output><button data-a="cnt" data-v="f:1" aria-label="Add">+</button></span></div>'+
@@ -933,6 +935,8 @@ GUIDES.c2=function(c){
  else if(t===6){var g=sec("c2","g."),ps2=g.blocks.filter(function(b){return b.t==="p"});var gI=["clock","people","camera","shield"];
   body=gsec("g.",splitTitle(g.h).t,'<p class="lead2">'+esc(ps2[0].x)+'</p><div class="grid2" style="margin-top:16px">'+[1,3,5,7].map(function(k,i){var op=S.open["pr"+i];var lab=ps2[k]?ps2[k].x:"";var mm=lab.split(":");return '<button class="fact" data-a="open" data-v="pr'+i+'" aria-expanded="'+!!op+'"><span class="b">'+I(gI[i])+'</span><span style="min-width:0"><span class="small muted" style="font-weight:700;letter-spacing:.05em;text-transform:uppercase">'+esc(mm[0])+'</span><b>'+esc(mm.slice(1).join(":").trim())+'</b>'+'<span class="more">'+esc(ps2[k+1]?ps2[k+1].x:"")+'</span></span></button>'}).join("")+'</div>')}
  return h+body};
+/* Even rows: 3 or 4 columns, whichever leaves fewer gaps in the last row (3 on a tie); 2 on phones */
+function balCols(n){var c=n<=4?n:(function(){var g3=(3-n%3)%3,g4=(4-n%4)%4;return g4<g3?4:3})();return "--cols:"+c}
 function rpt(n,s){var o="";for(var k=0;k<n;k++)o+=s;return o}
 function deck(key,slides){
  var cur=S.deck[key]||0;if(cur>=slides.length)cur=0;
@@ -956,7 +960,7 @@ function toolDesc(T,oi){var end=oi>-1?oi:T.blocks.length,out=[];for(var k=0;k<en
 function toolsView(c){
  var e=sec("c2","e."),tools=subs(e.blocks),ti=S.tab.c2tool||0,T=tools[ti];
  var tI=["clock","cal","chain","chart","eye"];
- var h='<p class="lead2" style="margin-top:22px">'+esc(para(e.blocks,"To support the development"))+'</p><div class="tiles itiles" style="margin-top:16px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">'+tools.map(function(t,i){return '<button class="tile" style="min-height:0;padding:14px;'+(i===ti?"border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset":"")+'" data-a="tab" data-v="c2tool:'+i+'"><span class="pic" style="width:44px;height:44px">'+I(tI[i])+'</span><b style="font-size:.92rem">'+esc(t.h)+'</b></button>'}).join("")+'</div>';
+ var h='<p class="lead2" style="margin-top:22px">'+esc(para(e.blocks,"To support the development"))+'</p><div class="tiles itiles" style="margin-top:16px;'+balCols(tools.length)+'">'+tools.map(function(t,i){return '<button class="tile" style="min-height:0;padding:14px;'+(i===ti?"border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset":"")+'" data-a="tab" data-v="c2tool:'+i+'"><span class="pic" style="width:44px;height:44px">'+I(tI[i])+'</span><b style="font-size:.92rem">'+esc(t.h)+'</b></button>'}).join("")+'</div>';
  var obj=first(T.blocks,function(b){return /^Objective/.test(b.x||"")});var objTxt=obj.x.replace(/^Objective:?\s*/,"");if(!objTxt){var ix=T.blocks.indexOf(obj);objTxt=T.blocks[ix+1].x}
  var outs=[],oi=T.blocks.findIndex(function(b){return b.x==="Expected outputs"});
  if(oi>-1){for(var k=oi+1;k<T.blocks.length;k+=2){if(T.blocks[k].t!=="p"||/^Example of|^In summary|^Expected finding/.test(T.blocks[k].x))break;outs.push({h:T.blocks[k].x,p:(T.blocks[k+1]||{}).x||""})}}
