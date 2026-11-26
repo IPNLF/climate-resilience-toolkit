@@ -633,7 +633,7 @@ if(!TTS)document.documentElement.classList.add("nosay");
 if(LS.get("tk-big",false))document.documentElement.classList.add("big");
 /* "Ask the toolkit" demo. ASK_DEFAULT is the address of the Cloudflare Worker once it is set up.
    The panel only shows on phones that opened the site with ?ask in the address, and only when online. */
-var ASK_DEFAULT="";
+var ASK_DEFAULT="https://toolkit-ask.james-wareing.workers.dev/";
 var ASK_URL=LS.get("tk-askurl","")||ASK_DEFAULT;
 try{if(/[?&]ask\b/.test(location.search))LS.set("tk-askon",true)}catch(e){}
 function askOn(){return !!ASK_URL&&LS.get("tk-askon",false)&&navigator.onLine!==false}
