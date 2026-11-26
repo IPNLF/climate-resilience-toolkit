@@ -3,7 +3,7 @@
    so it opens and works with no signal. A new version replaces the old one on the next visit online.
    The toolkit text (content.json) is only ever stored if it is complete: a security filter or captive
    portal can return an empty or substitute page, and that must never replace the real text. */
-var VERSION = "2f4bdd7dd7";
+var VERSION = "20ee50ec0a";
 var CACHE = "toolkit-" + VERSION;
 var CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 var FONT_CSS = "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap";
