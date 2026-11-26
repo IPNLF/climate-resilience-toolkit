@@ -758,7 +758,7 @@ var REF_ADD=[
  ["Wahyono, A.","https://ejournal.brin.go.id/jmi/article/view/8493"],
  ["Yusuf, A. A.","https://idl-bnc-idrc.dspacedirect.org/handle/10625/46380"]
 ];
-function refAdd(x){if(/https?:\/\//.test(x))return "";var r=first(REF_ADD,function(e){return x.indexOf(e[0])===0});return r?'<span class="addlink"><a href="'+r[1]+'" target="_blank" rel="noopener">'+esc(r[1])+'</a><span class="addtag">Link added, not in the toolkit</span></span>':""}
+function refAdd(x){if(/https?:\/\//.test(x))return "";var r=first(REF_ADD,function(e){return x.indexOf(e[0])===0});return r?'<span class="addlink"><a href="'+r[1]+'" target="_blank" rel="noopener">'+esc(r[1])+'</a></span>':""}
 /* Web addresses already written in the document become links; nothing is added that the document doesn't contain */
 function linkify(html){return html.replace(/https?:\/\/[^\s<"]+/g,function(m){var tail=(m.match(/[.,;:)]+$/)||[""])[0],u=m.slice(0,m.length-tail.length);return '<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>'+tail})}
 function renderBlocks(blocks){
