@@ -76,6 +76,27 @@ main{margin-left:var(--rail);min-height:100vh;padding-bottom:48px}
 .sheet.wide{width:min(960px,calc(100vw - 32px));top:max(16px,env(safe-area-inset-top,0px));max-height:none}
 @media (max-width:860px){.sheet.wide{left:0;right:0;top:0;bottom:0;width:100vw;border-radius:0}}
 .askres{display:grid;gap:12px}
+.quiz{scroll-margin-top:84px}
+.qz{margin-top:20px}
+.qzq{display:flex;gap:10px;align-items:flex-start;font-weight:700;font-size:1.05rem;line-height:1.4;color:var(--navy)}
+.qn2{flex:none;width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-size:.9rem}
+.qzquote{margin:10px 0 0 38px;font-style:italic}
+.qzopts{display:grid;gap:8px;margin:10px 0 0 38px}
+.qzo{display:flex;gap:10px;align-items:center;text-align:left;width:100%;min-height:48px;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);font-size:1rem;line-height:1.35;color:var(--ink)}
+.qzo:not([disabled]):hover{border-color:var(--c)}
+.qzo[disabled]{cursor:default}
+.qzo.ok{border-color:var(--c);background:var(--c-soft)}
+.qzo.bad{border-color:#C9532A;background:#FBE7DF}
+.qzo.off{opacity:.6}
+.qzo.picked{border-color:var(--navy)}
+.qzm{margin-left:auto;flex:none;display:grid;place-items:center}
+.qzo.ok .qzm{color:var(--c)}.qzo.bad .qzm{color:#C9532A}
+.qzpos{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:.85rem}
+.qzfb{margin:10px 0 0 38px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700}
+.qzfb.ok{color:var(--c)}.qzfb.bad{color:#8A3A12}
+.qzol{width:100%;margin:0;padding-left:20px;font-weight:400;color:var(--ink)}
+.qzscore{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;padding:14px 16px;background:var(--c-soft);border-radius:14px;font-size:1.1rem;color:var(--navy)}
+@media (max-width:860px){.qzopts,.qzfb,.qzquote{margin-left:0}}
 .askpart h3{font-size:1.05rem;line-height:1.3;color:var(--navy);margin-bottom:6px}
 .askpts{margin:0;padding-left:20px;font-size:1.02rem;line-height:1.5}.askpts li{margin-top:4px}
 .sheet.wide .askpts{font-size:1.1rem}
@@ -637,7 +658,7 @@ var B=[],CH=[],CHI={};
 var PWA={ready:false,offline:false,prompt:null,ios:/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),standalone:(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true};
 var S={tester:LS.get("tk-tester2",false),locked:false,route:"home",mode:LS.get("tk-mode",{}),variant:LS.get("tk-var2",{home:"A",sop:"C",survey:"A",consent:"B"}),
  ticks:LS.get("tk-ticks",{}),pendingBlock:null,tab:{},deck:{},q:{},timer:{el:0,run:false,h:null},
- fgdc:{p:0},sopOpen:{},ask:{q:"",busy:false,res:null,err:""},tlr:LS.get("tk-tl",[]),psp:{count:{f:0,m:0},cal:LS.get("tk-cal",{}),hot:LS.get("tk-hot",{}),score:[3,3,3,3,3,3],tl:0,plan:{}},journey:{0:0,1:0},pick:{},venn:0,level:0,fgdGroup:LS.get("tk-fgdg",0),fgdQ:0,why:{},open:{},glossQ:""};
+ fgdc:{p:0},sopOpen:{},quiz:{},ask:{q:"",busy:false,res:null,err:""},tlr:LS.get("tk-tl",[]),psp:{count:{f:0,m:0},cal:LS.get("tk-cal",{}),hot:LS.get("tk-hot",{}),score:[3,3,3,3,3,3],tl:0,plan:{}},journey:{0:0,1:0},pick:{},venn:0,level:0,fgdGroup:LS.get("tk-fgdg",0),fgdQ:0,why:{},open:{},glossQ:""};
 var SAY={},sayN=0;
 var TTS=("speechSynthesis" in window)&&typeof SpeechSynthesisUtterance!=="undefined";
 if(!TTS)document.documentElement.classList.add("nosay");
@@ -888,7 +909,7 @@ function homeTasks(){
  '</div>'}
 function homeBook(){
  return '<div class="sech"><h2>Contents</h2></div><div class="book">'+CH.map(function(c){var m=META[c.id]||META.refs,n=c.id.charAt(0)==="c"?c.id.slice(1):"";
-  var chips=c.secs.filter(function(s){return s.b}).map(function(s){var sk=splitTitle(s.h).k,act=(GUIDES[c.id]===sopGuide||c.id==="c2")&&sk?'data-a="navsec" data-v="'+c.id+':'+sk+'"':'data-a="jumpfull" data-v="'+s.b.i+'"';return '<button class="chip" '+act+'>'+esc(s.h)+'</button>'}).join("");var more=c.secs.filter(function(s){return s.b}).length-6;
+  var chips=c.secs.filter(function(s){return s.b}).map(function(s){var sk=splitTitle(s.h).k,act=(VKEY[c.id]==="sop"||c.id==="c2")&&sk?'data-a="navsec" data-v="'+c.id+':'+sk+'"':'data-a="jumpfull" data-v="'+s.b.i+'"';return '<button class="chip" '+act+'>'+esc(s.h)+'</button>'}).join("");var more=c.secs.filter(function(s){return s.b}).length-6;
   return '<div class="chap" style="'+chStyle(c.id)+'"><button class="n" data-a="nav" data-v="'+c.id+'" aria-label="Open chapter">'+(n||I(m.icon))+'</button><span><button class="chaph" data-a="nav" data-v="'+c.id+'"><h3>'+esc(c.title.replace(/^\d+\.\s*/,""))+'</h3></button><span class="chips">'+chips+'</span></span><button class="go" data-a="nav" data-v="'+c.id+'" aria-label="Open chapter">'+I("right")+'</button></div>'}).join("")+'</div>'}
 var JOURNEYS=[
  {title:"Participatory Scenario Planning",cid:"c2",stops:[["c2","stage:0","map"],["c2","stage:1","wave"],["c2","stage:2","people"],["c2","stage:3","refresh"],["c2","stage:4","eye"],["c2","stage:5","target"]]},
@@ -1252,6 +1273,68 @@ function tick(){if(!S.timer.run)return;S.timer.el=Math.floor((Date.now()-S.timer
  var inf=stageInfo(S.timer.el),txt=st[cur].h+" · "+leftTxt(inf);var l=$("#clkst");if(l)l.textContent=txt;var l2=$("#clkst2");if(l2)l2.textContent=txt;var c2=$("#clk2");if(c2)c2.textContent=fmt(S.timer.el);
  if(S.timer.stage!=null&&S.timer.stage!==cur){try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}S.timer.stage=cur;if(S.tab.c10st!=null)S.tab.c10st=cur;if(S.route==="c10"&&$("#clk"))render(false);return}S.timer.stage=cur}
 
+/* ============ Knowledge checks ============
+   Every answer option is a line from the toolkit (a "DO NOT" prefix is dropped where the question already says "never",
+   and a role's own name is blanked out of its description). Question stems are short fixed patterns.
+   Scores stay on this phone. */
+function rng(seed){var x=(seed>>>0)||1;return function(){x=(x*1664525+1013904223)>>>0;return x/4294967296}}
+function shuffled(a,seed){var g=rng(seed),b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(g()*(i+1)),t=b[i];b[i]=b[j];b[j]=t}return b}
+function cap1(t){t=String(t).trim();return t.charAt(0).toUpperCase()+t.slice(1)}
+function uniq(a){var o=[];a.forEach(function(x){if(x&&o.indexOf(x)<0)o.push(x)});return o}
+function mcq(stem,right,wrong,ref,quote){var w=uniq(wrong).filter(function(x){return x!==right}).slice(0,3);return {t:"mc",q:stem,quote:quote||"",opts:[right].concat(w),ref:ref}}
+function ordq(stem,list,ref){return {t:"order",q:stem,opts:list,ref:ref}}
+function stepsOf(sc){var out=[],cur=null;items(sc.blocks).forEach(function(it){var m=it.k==="label"&&it.x.match(/^Step (\d+):\s*(.*)$/);if(m){cur={n:m[1],t:m[2],its:[]};out.push(cur)}else if(cur&&it.k!=="label")cur.its.push(it)});return out}
+function neverItems(){var sc=first(CHI.c9.secs,function(x){return /CANNOT/.test(x.h)});return sc?items(sc.blocks).filter(function(x){return x.k!=="label"}).map(function(x){return {x:cap1(x.x.replace(/^DO NOT\s+/i,"")),i:x.i}}):[]}
+function shouldItems(){var sc=sec("c8","j."),on=false,out=[];items(sc.blocks).forEach(function(it){if(it.k==="label")on=/should/i.test(it.x);else if(on)out.push(it)});return out}
+function doItems(){var out=[];stepsOf(sec("c5","h.")).forEach(function(o){o.its.forEach(function(x){if(!/^(don'?t|do not|never|avoid)\b/i.test(x.x))out.push(x)})});return out}
+var QUIZ={
+ c5:function(){var sc=sec("c5","h."),st=stepsOf(sc),q=[];
+  [1,2,3].forEach(function(k){var o=st[k];if(!o||!o.its.length)return;var right=o.its[0];
+   var wrong=st.filter(function(_,j){return j!==k}).map(function(p,j){return p.its.length?p.its[(j+1)%p.its.length].x:""});
+   q.push(mcq("Which of these is part of Step "+o.n+": "+o.t+"?",right.x,wrong,right.i))});
+  q.push(ordq("Put the steps of the interview protocol in order.",st.map(function(o){return o.t}),sc.b.i));
+  return {title:splitTitle(sc.h).t,qs:q}},
+ c7:function(){var secs=consentSecs(CHI.c7).filter(function(x){return /^[a-g]\./.test(x.h)}),titles=secs.map(function(x){return splitTitle(x.h).t}),q=[];
+  ["f","c","d"].forEach(function(L,n){var sc=first(secs,function(x){return x.h.indexOf(L+".")===0});if(!sc)return;
+   var pb=first(sc.blocks,function(b){return b.t==="p"&&b.x.indexOf("☐")<0&&!/^\(/.test(b.x)});if(!pb)return;
+   var right=splitTitle(sc.h).t;q.push(mcq("Which part of the consent script says this?",right,shuffled(titles.filter(function(t){return t!==right}),7+n),pb.i,sentences(pb.x)[0].trim()))});
+  return {title:META.c7.short,qs:q}},
+ c8:function(){var sc=sec("c8","j."),sh=shouldItems(),nv=neverItems(),q=[];if(!nv.length)return {title:"",qs:[]};
+  [0,1,2].forEach(function(k){var o=sh[k];if(!o)return;var wrong=[0,1,2].map(function(j){return nv[(k*3+j)%nv.length].x});
+   q.push(mcq("A respondent is under pressure or at risk. Which of these should the enumerator do?",o.x,wrong,o.i))});
+  return {title:splitTitle(sc.h).t,qs:q}},
+ c9:function(){var nv=neverItems(),dos=doItems(),q=[];if(!dos.length)return {title:"",qs:[]};
+  [0,1,2].forEach(function(k,n){var o=nv[k];if(!o)return;var wrong=[0,1,2].map(function(j){return dos[(n*3+j*2+1)%dos.length].x});
+   q.push(mcq("Which of these must an enumerator never do?",o.x,wrong,o.i))});
+  var sc=first(CHI.c9.secs,function(x){return /CANNOT/.test(x.h)});return {title:sc?splitTitle(sc.h).t:"",qs:q}},
+ c2:function(){var st=stageList(),d=sec("c2","d."),titles=st.map(function(o){return o.title.split("\n").slice(1).join(" ").replace(/\s+/g," ").trim()}),q=[ordq("Put the six PSP stages in order.",titles,d.b.i)];
+  var pur=st.map(function(o){var f=first(o.fields,function(x){return /purpose/i.test(x.l)});return f?f.x.replace(/\s+/g," ").trim():""});
+  [1,4].forEach(function(k,n){if(!pur[k])return;q.push(mcq("What is the purpose of Stage "+(k+1)+": "+titles[k]+"?",pur[k],shuffled(pur.filter(function(x,j){return j!==k&&x}),11+n),d.b.i))});
+  return {title:splitTitle(d.h).t,qs:q}},
+ c10:function(){var g=sec("c10","g."),rs=subs(g.blocks),names=rs.map(function(x){return x.h}),q=[];
+  var mask=/\b(lead|main|facilitators?|notes?|takers?|minutes|field|coordinators?)\b/gi;
+  rs.forEach(function(x){var b=x.blocks[0];if(!b)return;q.push(mcq("Whose role is this?",x.h,names.filter(function(n){return n!==x.h}),b.i,sentences(b.x)[0].trim().replace(mask,"___")))});
+  return {title:splitTitle(g.h).t,qs:q}}
+};
+function quizFor(id){if(!QUIZ[id])return "";var Q;try{Q=QUIZ[id]()}catch(e){console.error(e);return ""}if(!Q||!Q.qs.length)return "";
+ var st=S.quiz[id]=S.quiz[id]||{a:{},seed:1},all=LS.get("tk-quiz",{}),right=0,done=0,total=Q.qs.length;
+ var body=Q.qs.map(function(q,qi){var a=st.a[qi],h='<div class="qz"><p class="qzq"><span class="qn2">'+(qi+1)+'</span><span>'+esc(q.q)+'</span></p>'+(q.quote?'<p class="quote qzquote">'+esc(q.quote)+'</p>':'');
+  if(q.t==="mc"){var order=shuffled(q.opts.map(function(_,k){return k}),st.seed*31+qi*7+3),ans=a!=null;if(ans){done++;if(a===0)right++}
+   h+='<div class="qzopts">'+order.map(function(k){var cls=ans?(k===0?" ok":(k===a?" bad":" off")):"";return '<button class="qzo'+cls+'" data-a="qz" data-v="'+id+':'+qi+':'+k+'"'+(ans?' disabled':'')+'><span>'+esc(q.opts[k])+'</span>'+(ans&&k===0?'<span class="qzm">'+I("check")+'</span>':ans&&k===a?'<span class="qzm">'+I("cross")+'</span>':'')+'</button>'}).join("")+'</div>';
+   if(ans)h+='<div class="qzfb '+(a===0?"ok":"bad")+'"><span>'+(a===0?"Correct.":"Not quite. The right answer is ticked.")+'</span>'+readMore(q.ref)+'</div>'}
+  else{var seq=a||[],order2=shuffled(q.opts.map(function(_,k){return k}),st.seed*17+qi*5+1),full=seq.length===q.opts.length,ok=full&&seq.every(function(v,k){return v===k});if(full){done++;if(ok)right++}
+   h+='<p class="small muted" style="margin-top:6px">Tap them in order, first to last.</p><div class="qzopts">'+order2.map(function(k){var pos=seq.indexOf(k),cls=full?(pos===k?" ok":" bad"):(pos>-1?" picked":"");return '<button class="qzo'+cls+'" data-a="qzord" data-v="'+id+':'+qi+':'+k+'"'+(pos>-1||full?' disabled':'')+'>'+(pos>-1?'<span class="qzpos">'+(pos+1)+'</span>':'')+'<span>'+esc(q.opts[k])+'</span></button>'}).join("")+'</div>';
+   if(full)h+='<div class="qzfb '+(ok?"ok":"bad")+'"><span>'+(ok?"Correct.":"Not quite. The right order is:")+'</span>'+(ok?'':'<ol class="qzol">'+q.opts.map(function(o){return '<li>'+esc(o)+'</li>'}).join("")+'</ol>')+readMore(q.ref)+'</div>';
+   else if(seq.length)h+='<button class="chip" style="margin-top:8px" data-a="qzundo" data-v="'+id+':'+qi+'">'+I("refresh").replace('class="i"','class="i" style="width:14px;height:14px;vertical-align:-2px"')+' Start this question again</button>'}
+  return h+'</div>'}).join("");
+ var fin=done===total;if(fin&&(all[id]==null||all[id]<right)){all[id]=right;LS.set("tk-quiz",all)}
+ return '<section class="gsec quiz" id="quiz-'+id+'"><div class="gh"><span class="tag">'+I("check").replace('class="i"','class="i" style="width:18px;height:18px"')+'</span><h2>Check your knowledge</h2></div>'+
+  '<p class="small muted">'+esc(Q.title)+' · '+total+' questions. Every answer is a line from the toolkit. Your score stays on this phone.</p>'+body+
+  (fin?'<div class="qzscore"><b>'+right+' / '+total+' correct</b><button class="btn ghost" data-a="qzreset" data-v="'+id+'">'+I("refresh")+'Try again</button></div>':(all[id]!=null?'<p class="small muted" style="margin-top:14px">Best score on this phone: '+all[id]+' / '+total+'</p>':''))+'</section>'}
+(function(){["c5","c7","c8","c9"].forEach(function(id){var g=GUIDES[id];GUIDES[id]=function(c){return g(c)+quizFor(id)}});
+ var g2=GUIDES.c2;GUIDES.c2=function(c){var h=g2(c);return S.tab.c2===3?h+quizFor("c2"):h};
+ var g10=GUIDES.c10;GUIDES.c10=function(c){var h=g10(c);return S.tab.c10===4?h+quizFor("c10"):h}})();
+
 /* ============ Supervisor page: the document's own supervisor text, gathered ============ */
 function supervisorPage(){
  var pick=function(cid,pre,from){var s=sec(cid,pre);if(!s)return [];var its=items(s.blocks),out=[],on=false;its.forEach(function(it){if(it.k==="label"){on=from.test(it.x)}else if(on)out.push(it)});return out};
@@ -1364,6 +1447,10 @@ document.addEventListener("click",function(e){
   case "helpclose":overlay=null;render(false);break;
   case "install":if(PWA.prompt){PWA.prompt.prompt();PWA.prompt.userChoice.then(function(){PWA.prompt=null;renderRail()})}else{overlay="install";render(false)}break;
   case "installclose":overlay=null;render(false);break;
+  case "qz":{var z=v.split(":");S.quiz[z[0]].a[+z[1]]=+z[2];render(false);break}
+  case "qzord":{var z2=v.split(":"),qa=S.quiz[z2[0]].a;qa[+z2[1]]=(qa[+z2[1]]||[]).concat([+z2[2]]);render(false);break}
+  case "qzundo":{var z3=v.split(":");delete S.quiz[z3[0]].a[+z3[1]];render(false);break}
+  case "qzreset":{var old=S.quiz[v]||{seed:1};S.quiz[v]={a:{},seed:old.seed+1};render(false);var qe=document.getElementById("quiz-"+v);if(qe)qe.scrollIntoView({block:"start"});break}
   case "ask":if(!askOn())break;overlay="ask";render(false);break;
   case "askclose":overlay=null;render(false);break;
   case "askwide":LS.set("tk-askwide",!LS.get("tk-askwide",false));render(false);break;
